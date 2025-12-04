@@ -1,0 +1,20 @@
+set windows-shell := ["powershell"]
+
+alias b := build
+alias r := run
+
+target_dir := "target"
+executable := "Hammurabi.exe"
+
+# build project
+build:
+    cmake -B {{target_dir}} \
+        -G Ninja \
+        -DCMAKE_C_COMPILER=clang \
+        -DCMAKE_CXX_COMPILER=clang++ \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    cmake --build {{target_dir}}
+
+# build and run project
+run: build
+    ./{{target_dir}}/{{executable}}
