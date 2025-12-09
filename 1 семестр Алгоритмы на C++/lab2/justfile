@@ -1,0 +1,26 @@
+set windows-shell := ["powershell"]
+
+alias b := build
+alias r := run
+alias t := test
+
+target_dir := "target"
+executable := "Array.exe"
+test_executable := "array_test.exe"
+
+# build project
+build:
+    cmake -B {{target_dir}} \
+        -G Ninja \
+        -DCMAKE_C_COMPILER=clang \
+        -DCMAKE_CXX_COMPILER=clang++ \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    cmake --build {{target_dir}}
+
+# build and run project
+run: build
+    ./{{target_dir}}/{{executable}}
+
+# test array class
+test: build
+    ./{{target_dir}}/{{test_executable}}
