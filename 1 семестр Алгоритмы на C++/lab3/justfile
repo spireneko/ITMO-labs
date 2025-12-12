@@ -1,0 +1,62 @@
+set windows-shell := ["powershell"]
+
+alias b := build
+alias br := build-release
+alias r := run
+alias rr := run-release
+alias t := test
+alias tr := test-release
+alias B := benchmark
+alias p := plot
+
+# Папки
+debug_target_dir := "target/debug"
+release_target_dir := "target/release"
+
+# Экзешники
+executable := "sort"
+test_executable := "sort_test"
+bench_executable := "quick_vs_insertion_bench"
+
+# build project (debug)
+build:
+    cmake -B {{debug_target_dir}} \
+        -G Ninja \
+        -DCMAKE_C_COMPILER=clang \
+        -DCMAKE_CXX_COMPILER=clang++ \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+        -DCMAKE_BUILD_TYPE=Debug
+    cmake --build {{debug_target_dir}}
+
+# build project (release)
+build-release:
+    cmake -B {{release_target_dir}} \
+        -G Ninja \
+        -DCMAKE_C_COMPILER=clang \
+        -DCMAKE_CXX_COMPILER=clang++ \
+        -DCMAKE_BUILD_TYPE=Release
+    cmake --build {{release_target_dir}}
+
+# build and run project (debug)
+run: build
+    ./{{debug_target_dir}}/{{executable}}
+
+# build and run project (release)
+run-release: build-release
+    ./{{release_target_dir}}/{{executable}}
+
+# test project (debug)
+test: build
+    ./{{debug_target_dir}}/{{test_executable}}
+
+# test project (release)
+test-release: build-release
+    ./{{release_target_dir}}/{{test_executable}}
+
+# benchmark project (release only)
+benchmark: build-release
+    ./{{release_target_dir}}/{{bench_executable}}
+
+# generates plot from benchmark's data
+plot:
+    uv run plot.py

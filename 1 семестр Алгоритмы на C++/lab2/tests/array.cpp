@@ -45,7 +45,6 @@ TEST(ArrayTest, InsertAtIndex) {
     EXPECT_EQ(arr.size(), 4);
 }
 
-// Тест удаления
 TEST(ArrayTest, Remove) {
     Array<int> arr;
 
@@ -199,7 +198,7 @@ class TestStruct {
     int id_;
     std::string name_;
 
-    TestStruct(int id = 0, const std::string& name = "") {
+    explicit TestStruct(int id = 0, const std::string& name = "") {
         id_ = id;
         name_ = name;
     }
