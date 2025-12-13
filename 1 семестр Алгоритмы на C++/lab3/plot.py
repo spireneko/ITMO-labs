@@ -33,7 +33,7 @@ def main() -> None:
 
     plt.title("Сравнение скорости сортировок на массивах разных размеров")
     plt.xlabel("Размер массива")
-    plt.ylabel("Скорость работы")
+    plt.ylabel("Время выполнения")
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
