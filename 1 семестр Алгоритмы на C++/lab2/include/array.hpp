@@ -52,10 +52,8 @@ class Array final {
         };
 
         void next() {
-            if (hasNext()) {
-                int32_t direction = is_forward_ ? 1 : -1;
-                index_ += 1 * direction;
-            }
+            int32_t direction = is_forward_ ? 1 : -1;
+            index_ += 1 * direction;
         };
 
         bool hasNext() const {
@@ -88,10 +86,8 @@ class Array final {
         };
 
         void next() {
-            if (hasNext()) {
-                int32_t direction = is_forward_ ? 1 : -1;
-                index_ += 1 * direction;
-            }
+            int32_t direction = is_forward_ ? 1 : -1;
+            index_ += 1 * direction;
         };
 
         bool hasNext() const {
@@ -138,16 +134,8 @@ class Array final {
 
     Array& operator=(const Array& rhs) {
         if (this != &rhs) {
-            clear();
-            free(buf_);
-
-            length_ = rhs.length_;
-            capacity_ = rhs.capacity_;
-            buf_ = static_cast<T*>(std::malloc(capacity_ * sizeof(T)));
-
-            for (int32_t i = 0; i < length_; i++) {
-                new (buf_ + i) T(rhs.buf_[i]);
-            }
+            Array tmp = Array(rhs);
+            swap(tmp);
         }
 
         return *this;
@@ -165,19 +153,16 @@ class Array final {
 
     Array& operator=(Array&& rhs) {
         if (this != &rhs) {
-            clear();
-            free(buf_);
-
-            length_ = rhs.length_;
-            capacity_ = rhs.capacity_;
-            buf_ = rhs.buf_;
-
-            rhs.buf_ = nullptr;
-            rhs.length_ = 0;
-            rhs.capacity_ = 0;
+            swap(rhs);
         }
 
         return *this;
+    }
+
+    void swap(Array& other) {
+        std::swap(buf_, other.buf_);
+        std::swap(length_, other.length_);
+        std::swap(capacity_, other.capacity_);
     }
 
     void clear() {
@@ -205,14 +190,9 @@ class Array final {
             resize();
         }
 
-        if (index < length_) {
-            new (buf_ + length_) T(std::move(buf_[length_ - 1]));
-
-            for (int32_t i = length_ - 1; i > index; i--) {
-                buf_[i] = std::move(buf_[i - 1]);
-            }
-
-            buf_[index].~T();
+        for (int32_t i = length_; i > index; i--) {
+            new (buf_ + i) T(std::move(buf_[i - 1]));
+            buf_[i - 1].~T();
         }
 
         new (buf_ + index) T(value);
@@ -224,18 +204,14 @@ class Array final {
     void remove(int index) {
         assert(index >= 0 && index < length_);
 
-        buf_[index].~T();
         length_ -= 1;
 
-        if (index < length_) {
-            new (buf_ + index) T(std::move(buf_[index + 1]));
-
-            for (int32_t i = index + 1; i < length_; i++) {
-                buf_[i] = std::move(buf_[i + 1]);
-            }
-
-            buf_[length_].~T();
+        for (int i = index; i < length_; ++i) {
+            buf_[i].~T();
+            new (buf_ + i) T(std::move(buf_[i + 1]));
         }
+
+        buf_[length_].~T();
     };
 
     const T& operator[](int index) const {
